@@ -1,5 +1,5 @@
 
-import { APP_USERS_NAME, JWT_SECRET, USER_NOT_FOUND_FILE_MESSAGE } from '../constants/index.js';
+import { APP_USERS_NAME, INTERNAL_LOGIN_ERROR, JWT_SECRET, USER_NOT_FOUND_FILE_MESSAGE } from '../constants/index.js';
 import { getUsersFromEndPoint } from '../network/index.js';
 import { readFile, writeFile } from 'fs/promises'
 import { validate } from 'email-validator';
@@ -8,8 +8,8 @@ import jwt from 'jsonwebtoken';
 import { generateExecutionLog } from '../middlewares/calcTimes.js';
 
 
-//1
-export const writeFileUsers = async () => {
+
+export const writeUsersFile = async () => {
     try {
         const users = await getUsersFromEndPoint();
         const validResults = [];
@@ -44,27 +44,24 @@ const signToken = (payload, secret, options) => new Promise((resolve, reject) =>
 });
 
 export const login = async (req, res) => {
-    let status = HttpStatusCode.Ok;
-    let error = "";
-    const { body: { email, password }, requestId } = req;
+    const { body: { email } } = req;
     try {
         const fileResults = await readFile(APP_USERS_NAME);
         const users = JSON.parse(fileResults.toString());
         const isUser = users.find(user => user.email === email);
         if (!isUser) {
-            status = HttpStatusCode.NotFound;
-            error = USER_NOT_FOUND_FILE_MESSAGE;
-        }
-        const token = await signToken({ email, requestId, userCode: isUser.userCode }, JWT_SECRET, { expiresIn: '1h' });
-        generateExecutionLog(req, status, error, error);
-        if (!error) {
-            return res.json({ token });
+            const status = HttpStatusCode.NotFound;
+            const error = USER_NOT_FOUND_FILE_MESSAGE;
+            generateExecutionLog(req, status, error);
+            return res.status(status).send(error);
         }
 
-        res.status(status).send(error);
+        const token = await signToken({ email, userCode: isUser.userCode }, JWT_SECRET, { expiresIn: '1h' });
+        generateExecutionLog(req);
+        return res.json({ token });
     } catch (error) {
         console.log(error);
-        res.status(HttpStatusCode.InternalServerError).send("Error");
+        res.status(HttpStatusCode.InternalServerError).send(INTERNAL_LOGIN_ERROR);
     }
 
 }

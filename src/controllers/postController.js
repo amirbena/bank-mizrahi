@@ -7,6 +7,6 @@ import { CREATE_POST_KEYS_ARRAY } from "../constants/index.js";
 const router = Router();
 
 router.get('/', authMiddleware, getPosts);
-router.post('/', authMiddleware,(req,res,next)=>requestValidationMw(req,res,next,CREATE_POST_KEYS_ARRAY), createPost);
+router.post('/', authMiddleware, (req, res, next) => requestValidationMw(req, res, next, CREATE_POST_KEYS_ARRAY), createPost);
 
 export default router;

@@ -5,7 +5,7 @@ import { addStartTime } from './middlewares/calcTimes.js';
 import authController from './controllers/authController.js';
 import postController from './controllers/postController.js'
 import { HttpStatusCode } from 'axios';
-import { writeFileUsers } from './services/authService.js';
+import { writeUsersFile } from './services/authService.js';
 import { PORT } from './constants/index.js';
 
 
@@ -20,7 +20,7 @@ app.use('/posts', postController);
 
 app.get('/write-file', async (req, res) => {
     try {
-        await writeFileUsers();
+        await writeUsersFile();
         res.send(`Success to write users in File`);
 
     } catch (error) {

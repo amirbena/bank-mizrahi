@@ -17,9 +17,10 @@ const calcEndTime = (req) => {
     return { endTime, totalTimeInMS };
 }
 
-export const generateExecutionLog = (req, httpStatus = HttpStatusCode.Ok, errors = "", resBody = OUTPUT_MESSAGE) => {
+export const generateExecutionLog = (req, httpStatus = HttpStatusCode.Ok, errors = "") => {
     const { endTime, totalTimeInMS } = calcEndTime(req);
-    if (resBody === "") resBody = OUTPUT_MESSAGE;
+    let output = errors;
+    if (output === "") output = OUTPUT_MESSAGE;
     const level = httpStatus >= HttpStatusCode.BadRequest ? "Error" : "Info";
     const { method, requestId, path, startTime, params, body, hostname: host, baseUrl, ip: ipAddress, headers, user } = req;
     const log = {
@@ -34,7 +35,7 @@ export const generateExecutionLog = (req, httpStatus = HttpStatusCode.Ok, errors
             params,
             body
         },
-        output: resBody,
+        output,
         metadata: {
             host,
             baseUrl,

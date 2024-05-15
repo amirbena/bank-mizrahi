@@ -14,13 +14,8 @@ export const getUsersFromEndPoint = async () => {
 
 
 export const getPostsEndPoint = async () => {
-    try {
-        const result = await axios.get(POSTS_ENDPOINT);
-        return result.data;
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
+    const result = await axios.get(POSTS_ENDPOINT);
+    return result.data;
 }
 
 
